@@ -18,6 +18,7 @@ Templates
     :recursive:
 
     cflatfit.Templates
+    cflatfit.Templates.modifiers
 
 
 Likelihood
