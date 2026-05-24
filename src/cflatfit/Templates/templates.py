@@ -2,7 +2,7 @@ from __future__ import annotations
 import numpy as np
 # from hammer.hammerlib import Hammer, IOBuffer, RecordType
 
-from cflatfit.Templates.modifiers import ModLinearSys
+from cflatfit.Templates.modifiers import ModInterpSys
 from cflatfit.Parameter import ParameterManager, Parameter, ConstraintType
 from cflatfit.logger_config import make_logger
 logger = make_logger(__name__)
@@ -15,17 +15,17 @@ class Template:
                  N: np.ndarray,
                  Nerr: np.ndarray,
                  isnorm: bool) -> None:
-        self._name            : str              = name
-        self._label           : str              = name
-        self._shape           : tuple[int]       = None
-        self._N               : np.ndarray       = None
-        self._Nerr            : np.ndarray       = None
-        self._isnorm          : bool             = isnorm
-        self._param_manager   : ParameterManager = ParameterManager()
-        self._constraint      : ConstraintType   = ConstraintType.NONE
-        self._additive_mod    : list             = []
-        self._nuisance_params : list[str]        = []
-        self._has_variance    : bool             = False
+        self._name            : str                = name
+        self._label           : str                = name
+        self._shape           : tuple[int]         = None
+        self._N               : np.ndarray         = None
+        self._Nerr            : np.ndarray         = None
+        self._isnorm          : bool               = isnorm
+        self._param_manager   : ParameterManager   = ParameterManager()
+        self._constraint      : ConstraintType     = ConstraintType.NONE
+        self._additive_mod    : list[ModInterpSys] = []
+        self._nuisance_params : list[str]          = []
+        self._has_variance    : bool               = False
         self.set_templates(N, Nerr)
 
     @property
@@ -41,7 +41,7 @@ class Template:
     @property
     def param_manager(self) -> ParameterManager: return self._param_manager
     @property
-    def additive_mod(self) -> list: return self._additive_mod
+    def additive_mod(self) -> list[ModInterpSys]: return self._additive_mod
     @property
     def constraint(self) -> ConstraintType: return self._constraint
     @property
@@ -70,12 +70,13 @@ class Template:
             logger.info("NOTE: No template errors provided, assuming poisson")
             self._Nerr = np.sqrt(self.N)
     
-    def add_linearsys(self, nupar: Parameter, h_min: np.ndarray, h_max: np.ndarray) -> None:
+    def add_interpsys(self, modifier: ModInterpSys, nupar: Parameter, 
+                      h_min: np.ndarray, h_max: np.ndarray) -> None:
         if nupar.constrainttype == ConstraintType.NONE:
             nupar.setlim(-5, 5)
             nupar.constrain_gauss(0.0, 1.0)
         self.param_manager.addParam(nupar)
-        mod = ModLinearSys(nupar.name, h_min, h_max)
+        mod = modifier(nupar.name, h_min, h_max)
         self.additive_mod.append(mod)
 
     def get_additive_mod(self, hnom: np.ndarray) -> np.ndarray:
@@ -125,7 +126,7 @@ class Template:
     def calc_hist(self) -> tuple[np.ndarray, float]:
         self.vary_hist()
         self.update_all_nuisance()
-        hist = self.N + self.get_additive_mod(hist)
+        hist = self.N + self.get_additive_mod(self.N)
         norm = np.sum(hist)        
         return hist, norm
     
@@ -211,7 +212,7 @@ class TemplateBB(Template):
         self.vary_hist()
         self.update_all_nuisance()
         hist = self.get_nuisance_hist()
-        hist += self.get_additive_mod(hist)
+        hist += self.get_additive_mod(self.N)
         norm = np.sum(hist)        
         return hist, norm
 

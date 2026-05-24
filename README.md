@@ -25,4 +25,4 @@ git clone https://github.com/dvicoben/cflatfit.git
 cd cflatfit
 pip install -e .
 ```
-which should install the package (`fflat`) and the required dependencies.
+which should install the package (`cflatfit`) and the required dependencies.
