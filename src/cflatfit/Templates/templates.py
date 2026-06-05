@@ -238,6 +238,7 @@ class TemplateGauss(Template):
         if bin_N <= 0.0 or sigma > 1.0:
             logger.warning(f"Template {self.name} Invalid yield in bin {ibin} (N={bin_N}), {xi.name} is fixed to 1.0")
             xi.fix(1.0)
+        xi.use()
         self.param_manager.addParam(xi)
         self.nuisance_params.append(xi.name)
     
