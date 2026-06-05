@@ -91,7 +91,7 @@ class Template:
 
     def create_all_nuisance(self) -> None:
         for ibin in range(len(self.N)):
-            self.create_nuisance(self, ibin)
+            self.create_nuisance(ibin)
 
     def update_nuisance(self, ibin: int):
         # Implement in derived classes
