@@ -75,6 +75,7 @@ class Template:
         if nupar.constrainttype == ConstraintType.NONE:
             nupar.setlim(-5, 5)
             nupar.constrain_gauss(0.0, 1.0)
+        nupar.use()
         self.param_manager.addParam(nupar)
         mod = modifier(nupar.name, h_min, h_max)
         self.additive_mod.append(mod)
