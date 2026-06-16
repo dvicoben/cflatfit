@@ -71,8 +71,8 @@ class Template:
             self._Nerr = np.sqrt(self.N)
     
     def add_interpsys(self, modifier: ModInterpSys, nupar: Parameter, 
-                      h_min: np.ndarray, h_max: np.ndarray) -> None:
-        if nupar.constrainttype == ConstraintType.NONE:
+                      h_min: np.ndarray, h_max: np.ndarray, no_constraint: bool = False) -> None:
+        if nupar.constrainttype == ConstraintType.NONE and not no_constraint:
             nupar.setlim(-5, 5)
             nupar.constrain_gauss(0.0, 1.0)
         nupar.use()
