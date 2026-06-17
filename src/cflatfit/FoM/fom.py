@@ -95,23 +95,23 @@ class FigureOfMerit:
         self.updateVals(paramvals)
         return self.evaluate() + self.offset
     
-    def evaluate(self):
+    def evaluate(self) -> float:
         # return self.nll()
         raise Exception("FOM evaluate specified in derived class")
 
-    def nll(self):
+    def nll(self) -> float:
         fom = [cf.poisson_chi2(ich.data, ich.get_model()) for ich in self.channels.values()]
         return np.sum(fom) + self.get_constraint_term()
     
-    def nllW2(self):
+    def nllW2(self) -> float:
         fom = [cf.poisson_chi2_W2(ich.data, ich.get_model(), ich.scaleFactorW2) for ich in self.channels.values()]
         return np.sum(fom) + self.get_constraint_term()
     
-    def calc_nllW2(self, paramvals: list[float]):
+    def calc_nllW2(self, paramvals: list[float]) -> float:
         self.updateVals(paramvals)
         return self.nllW2()
 
-    def chi2(self):
+    def chi2(self) -> float:
         chi2 = [np.sum((ich.data - ich.get_model())**2 / (ich.dataVar)) for ich in self.channels.values()]
         return np.sum(chi2) + self.get_constraint_term()
     
