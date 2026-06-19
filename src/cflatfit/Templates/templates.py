@@ -17,7 +17,7 @@ class Template:
                  isnorm: bool) -> None:
         self._name            : str                = name
         self._label           : str                = name
-        self._shape           : tuple[int]         = None
+        self._shape           : tuple[int, ...]    = None
         self._N               : np.ndarray         = None
         self._Nerr            : np.ndarray         = None
         self._isnorm          : bool               = isnorm
@@ -33,7 +33,7 @@ class Template:
     @property
     def label(self) -> str: return self._label
     @property
-    def shape(self) -> tuple[int]: return self._shape
+    def shape(self) -> tuple[int, ...]: return self._shape
     @property
     def N(self) -> np.ndarray: return self._N
     @property
@@ -53,7 +53,7 @@ class Template:
     def set_param_manager(self, param_manager: ParameterManager) -> None:
         self._param_manager = param_manager
     
-    def set_templates(self, N: np.ndarray, Nerr: np.ndarray) -> None:
+    def set_templates(self, N: np.ndarray, Nerr: np.ndarray | None) -> None:
         N = np.array(N)
         # if np.sum(N) < 1e-3:
         #     self._isnull = True
@@ -70,7 +70,7 @@ class Template:
             logger.info("NOTE: No template errors provided, assuming poisson")
             self._Nerr = np.sqrt(self.N)
     
-    def add_interpsys(self, modifier: ModInterpSys, nupar: Parameter, 
+    def add_interpsys(self, modifier: type[ModInterpSys], nupar: Parameter, 
                       h_min: np.ndarray, h_max: np.ndarray, no_constraint: bool = False) -> None:
         if nupar.constrainttype == ConstraintType.NONE and not no_constraint:
             nupar.setlim(-5, 5)
@@ -124,11 +124,11 @@ class Template:
             self.set_templates(vals, self.Nerr)
         self.update_all_nuisance(force = True)
 
-    def calc_hist(self) -> tuple[np.ndarray, float]:
+    def calc_hist(self) -> tuple[np.ndarray[float], float]:
         self.vary_hist()
         self.update_all_nuisance()
         hist = self.N + self.get_additive_mod(self.N)
-        norm = np.sum(hist)        
+        norm = np.sum(hist) 
         return hist, norm
     
     def get_raw_norm(self) -> np.ndarray:
@@ -251,7 +251,9 @@ class TemplateGauss(Template):
     def calc_hist(self) -> tuple[np.ndarray, float]:
         self.vary_hist()
         self.update_all_nuisance()
-        hist = self.N + self.get_additive_mod(self.N)
-        hist = self.get_nuisance_hist()*hist
+        # Order here not obvious:
+        hist = self.get_nuisance_hist()*(self.N + self.get_additive_mod(self.N))
+        # Or maybe?
+        # hist = self.get_nuisance_hist()*self.N + self.get_additive_mod(self.N)
         norm = np.sum(hist)
         return hist, norm
