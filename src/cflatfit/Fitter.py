@@ -87,12 +87,15 @@ class imFitter:
         
         fmin = self.m.fmin
         diag = [
-            f"FMin: {fmin.fval} | Valid: {fmin.is_valid} | EDM: {self.m.fmin.edm}",
-            f"Above EDM: {fmin.is_above_max_edm} | Call Limit: {fmin.has_reached_call_limit}",
-            f"Covariance: {get_covariance_str(fmin.has_accurate_covar, fmin.has_made_posdef_covar)}",
+            "Fit Result:",
+            f" | FMin: {fmin.fval}", 
+            f" | Valid: {fmin.is_valid}", 
+            f" | EDM: {self.m.fmin.edm}",
+            f" | Above EDM: {fmin.is_above_max_edm}",
+            f" | Call Limit: {fmin.has_reached_call_limit}",
+            f" | Covariance: {get_covariance_str(fmin.has_accurate_covar, fmin.has_made_posdef_covar)}",
         ]
-        for ielem in diag:
-            logger.info(ielem)
+        logger.info("\n".join(diag))
 
 
     def corr(self, savepath: str = None, parlist: list[str] = [], labels: list[str] = []) -> np.ndarray:
