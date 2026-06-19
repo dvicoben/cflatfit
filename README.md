@@ -26,3 +26,6 @@ cd cflatfit
 pip install -e .
 ```
 which should install the package (`cflatfit`) and the required dependencies.
+
+# TO DO:
+- [ ] Incorporate PDFBase external constraint to minimizaiton (e.g. for sum of yields)
