@@ -124,7 +124,7 @@ class Channel:
 
     def plot_projection(self, bin_edges: list[float], 
                         include_template_err: bool = True,
-                        colors: dict[str, str] = {},
+                        colors: dict[str, str] | None = None,
                         remove_pull: bool = False
                         ) -> tuple[plt.Figure, plt.Axes, plt.Axes]:
         fig, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]})

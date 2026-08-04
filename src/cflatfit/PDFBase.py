@@ -11,12 +11,12 @@ logger = make_logger(__name__)
 class PDFBase:
     def __init__(self, 
                  name: str,
-                 param_manager: ParameterManager = None,
-                 params_list: list[str] = [],
+                 param_manager: ParameterManager | None = None,
+                 params_list: list[str] | None = None,
                 ):
         
         self._name: str = name
-        self._params: dict[str, str] = {ipar : None for ipar in params_list}    
+        self._params: dict[str, str] = {ipar : None for ipar in params_list} if params_list is not None else {}
         self._param_manager: ParameterManager = param_manager if param_manager is not None else ParameterManager()
         self._templates: dict[str, Template] = {}
         self._external_constraints: list[str] = []
@@ -169,13 +169,13 @@ class PDFBase:
         ax.legend()
         return fig, ax
 
-    def plot_projection(self, bin_edges: list[float], ax: plt.Axes, colors: dict[str, str] = {}) -> None:
+    def plot_projection(self, bin_edges: list[float], ax: plt.Axes, colors: dict[str, str] | None = None) -> None:
         # bc = 0.5*(bin_edges[1:] + bin_edges[:-1])
         # bw = 0.5*(bin_edges[1:] - bin_edges[:-1])
         N = self.get_yields()
         hres = [np.concatenate((self.templates[k].h()*N[k], [0])) for k in N]
         labels = [self.templates[k].label for k in N]
-        if len(colors) > 0:
+        if colors is not None:
             color = [colors[k] for k in N]
             ax.stackplot(bin_edges, hres[::-1], labels=labels[::-1], colors=color[::-1], step="post")
         else:
