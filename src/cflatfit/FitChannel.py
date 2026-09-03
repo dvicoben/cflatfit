@@ -125,7 +125,8 @@ class Channel:
     def plot_projection(self, bin_edges: list[float], 
                         include_template_err: bool = True,
                         colors: dict[str, str] | None = None,
-                        remove_pull: bool = False
+                        remove_pull: bool = False,
+                        use_norm_templates: bool = True
                         ) -> tuple[plt.Figure, plt.Axes, plt.Axes]:
         fig, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]})
         if remove_pull:
@@ -135,7 +136,7 @@ class Channel:
         bc = 0.5*(bin_edges[1:] + bin_edges[:-1])
         bw = 0.5*(bin_edges[1:] - bin_edges[:-1])
         
-        self.pdf.plot_projection(bin_edges, ax1, colors)
+        self.pdf.plot_projection(bin_edges, ax1, colors, use_norm_templates)
         kwargs = {"fmt" : 'ko', "markersize" : 2, "label" : "Data"}
         ax1.errorbar(bc, self.data, yerr=self.dataErr, **kwargs)
 

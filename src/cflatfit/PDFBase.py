@@ -169,11 +169,14 @@ class PDFBase:
         ax.legend()
         return fig, ax
 
-    def plot_projection(self, bin_edges: list[float], ax: plt.Axes, colors: dict[str, str] | None = None) -> None:
+    def plot_projection(self, bin_edges: list[float], ax: plt.Axes, colors: dict[str, str] | None = None, use_norm_templates: bool = True) -> None:
         # bc = 0.5*(bin_edges[1:] + bin_edges[:-1])
         # bw = 0.5*(bin_edges[1:] - bin_edges[:-1])
         N = self.get_yields()
-        hres = [np.concatenate((self.templates[k].h()*N[k], [0])) for k in N]
+        if use_norm_templates:
+            hres = [np.concatenate((self.templates[k].h()*N[k], [0])) for k in N]
+        else:
+            hres = [np.concatenate((self.templates[k].H()*N[k], [0])) for k in N]
         labels = [self.templates[k].label for k in N]
         if colors is not None:
             color = [colors[k] for k in N]
