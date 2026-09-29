@@ -24,13 +24,13 @@ class NLLScaled(FigureOfMerit):
         fom = [cf.poisson_scaled_chi2(ich.data, ich.dataVar, ich.get_model()) for ich in self.channels.values()]
         return np.sum(fom) + self.get_constraint_term()
 
-    def generate(self, rng: np.random.Generator = np.random.default_rng(), scale_err: float = 1.) -> FigureOfMerit:
+    def generate(self, rng: np.random.Generator = np.random.default_rng(), scale_err: float = 1., use_effstats: bool = False) -> FigureOfMerit:
         newFOM = copy.deepcopy(self)
         other = copy.deepcopy(self)
         toydata = {}
         for ichannel in other.channels.values():
             # Scaled Poisson distr, so scale to effective stats sum(weights)/sum(weights**2) 
-            t = ichannel.data / ichannel.dataVar
+            t = ichannel.data / ichannel.dataVar if use_effstats else 1.
             itoy = ichannel.get_model()
             itoy = rng.poisson(t*itoy).astype(float)
             itoyerr = np.ones_like(itoy)

@@ -54,6 +54,7 @@ class imFitter:
     def fit(self, ncall: int = None, sumW2error: bool = False) -> tuple[list[float], list[float]]:
         if not self.m:
             self.minuit_setup()
+        ncall = int(ncall)
         self.migrad(ncall)
         self.hesse(ncall)
         
@@ -90,8 +91,8 @@ class imFitter:
             "Fit Result:",
             f" | FMin: {fmin.fval}", 
             f" | Valid: {fmin.is_valid}", 
-            f" | EDM: {self.m.fmin.edm}",
-            f" | Above EDM: {fmin.is_above_max_edm}",
+            f" | EDM: {fmin.edm}",
+            f" | Above Max EDM: {fmin.is_above_max_edm}",
             f" | Call Limit: {fmin.has_reached_call_limit}",
             f" | Covariance: {get_covariance_str(fmin.has_accurate_covar, fmin.has_made_posdef_covar)}",
         ]
