@@ -214,10 +214,10 @@ class Parameter:
 
     def use(self):
         # Could set to always be false if parameter is fixed, no need to pass minuit a fixed parameter
-        # if self.fixed:
-        #     logger.info(f"Parameter {self.name} is fixed so forced unused in fitter")
-        #     self._in_use = False
-        #     return
+        if self.fixed:
+            # logger.info(f"Parameter {self.name} is fixed so forced unused in fitter")
+            self._in_use = False
+            return
         self._in_use = True
     
     def unuse(self):
