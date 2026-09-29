@@ -102,7 +102,7 @@ class Template:
         if not self._has_variance and not force:
             return
         
-        for ibin in range(self.N):
+        for ibin in range(len(self.N)):
             self.update_nuisance(ibin)
 
     def get_nuisance_hist(self) -> np.ndarray:
