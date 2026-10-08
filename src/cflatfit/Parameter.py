@@ -128,14 +128,15 @@ class Parameter:
                  limhi: float = None,
                  fixed: bool = False):
 
-        self._name: str = name
-        self._val: float = val
-        self._limlo: float = limlo
-        self._limhi: float = limhi
-        self._fixed: bool = fixed
-        self._constrainttype: ConstraintType = ConstraintType.NONE
-        self._constraintvals: list[float] = []
-        self._in_use: bool = False
+        self._name           : str            = name
+        self._initval        : float          = val
+        self._val            : float          = val
+        self._limlo          : float          = limlo
+        self._limhi          : float          = limhi
+        self._fixed          : bool           = fixed
+        self._constrainttype : ConstraintType = ConstraintType.NONE
+        self._constraintvals : list[float]    = []
+        self._in_use         : bool           = False
 
     @property
     def name(self) -> str: return self._name
