@@ -151,7 +151,7 @@ class Channel:
 
         hres_sum = self.pdf.pdf()
         hres_err_total = self.pdf.pdf_err()
-        residual = hres_sum - self.data
+        residual = self.data - hres_sum # hres_sum - self.data
         pulls = (residual)/np.sqrt(self.dataErr**2 + hres_err_total**2) if include_template_err else (residual)/self.dataErr
         # ax2.errorbar(bc, pulls, xerr=bw, yerr=1., fmt='ko', markersize=2)
         ax2.stairs(pulls, bin_edges, fill=True, color='k', alpha = 0.85)
@@ -191,7 +191,7 @@ class Channel:
         if remove_pull:
             return fig, ax1
         
-        residual = hres_sum - self.data
+        residual = self.data - hres_sum # hres_sum - self.data
         pulls = (residual)/self.dataErr
         # ax2.errorbar(bc, pulls, xerr=bw, yerr=1., fmt='ko', markersize=2)
         ax2.stairs(pulls, bin_edges, fill=True, color='k', alpha = 0.85)
