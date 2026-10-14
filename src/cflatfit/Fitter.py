@@ -54,7 +54,7 @@ class imFitter:
     def fit(self, ncall: int = None, sumW2error: bool = False) -> tuple[list[float], list[float]]:
         if not self.m:
             self.minuit_setup()
-        ncall = int(ncall)
+        ncall = int(ncall) if ncall is not None else ncall
         self.migrad(ncall)
         self.hesse(ncall)
         
