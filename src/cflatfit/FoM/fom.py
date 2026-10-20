@@ -133,5 +133,15 @@ class FigureOfMerit:
         
         return newFOM
 
+    def generate_azimov(self, use_data_err: bool = False) -> FigureOfMerit:
+        newFOM = copy.deepcopy(self)
+        other = copy.deepcopy(self)
+
+        for ichannel in other.channels.values():
+            itoy = ichannel.get_model()
+            itoyerr = ichannel.dataErr if use_data_err else ichannel.get_model_err()
+            newFOM.channels[ichannel.name].set_data(itoy, itoyerr)
+
+        return newFOM
 
 
