@@ -207,3 +207,25 @@ def nll_poisson(n: float, mu: float) -> float:
         Cost function value.
     """
     return 2*(n*(log_or_zero_float(n) - log_or_zero_float(mu)) + mu - n)
+
+
+def chi2_correlated(n: np.ndarray, mu: np.ndarray, covinv: np.ndarray) -> float:
+    """Poisson term
+    
+    Parameters
+    ----------
+    n : np.ndarray
+        Observed counts.
+    mu : np.ndarray
+        Expected counts per bin.
+    covinv : np.ndarray
+        Inverse covariance matrix
+
+    Returns
+    -------
+    chi2 : float
+        Cost function value.
+    """
+    delta = n - mu
+    chi = np.dot(delta, np.matmul(covinv, delta))
+    return chi

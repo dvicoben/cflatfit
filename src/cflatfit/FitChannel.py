@@ -62,11 +62,14 @@ class Channel:
         self._pdf: PDFBase = pdf
         self._data_shape: tuple[int] = np.shape(data)
         self._data: np.ndarray = np.array(data).ravel()
-        self._dataNorm = np.sum(self.data)
+        self._dataNorm: float = np.sum(self.data)
         self._dataErr: np.ndarray = np.sqrt(self.data) if dataErr is None else np.array(dataErr).ravel()
         self._dataVar: np.ndarray = self.dataErr**2
         self._normPDF_before_eval: bool = normPDF_before_eval
         self._scaleFactorW2: np.ndarray = (self.dataErr**2)/np.where(self.data != 0, self.data, 1.0)
+        self._cov: np.ndarray = None
+        self._corr: np.ndarray = None
+        self._covinv: np.ndarray = None
         
         self.make_nuisance_constraints()
         # Set the PDF parameters here to in_use such that they will be propagated to minimization
@@ -100,6 +103,22 @@ class Channel:
         self._dataErr: np.ndarray = np.sqrt(self.data) if dataErr is None else dataErr.ravel()
         self._dataVar: np.ndarray = self.dataErr**2
         self._scaleFactorW2: np.ndarray = (self.dataErr**2)/np.where(self.data != 0, self.data, 1.0)
+
+    def set_cov(self, cov: np.ndarray, calcinv: bool = True) -> None:
+        shp = np.shape(cov)
+        Ndat = len(self.data)
+        if (len(shp) != 2) or (shp != (Ndat, Ndat)):
+            logger.warning(f"Expected CovMatrix of shape {(Ndat, Ndat)}, but got {shp}")
+        self._cov = cov
+        if calcinv:
+            self._covinv = np.linalg.inv(cov)
+
+    def set_corr(self, corr: np.ndarray) -> None:
+        shp = np.shape(corr)
+        Ndat = len(self.data)
+        if (len(shp) != 2) or (shp != (Ndat, Ndat)):
+            logger.warning(f"Expected CorrMatrix of shape {(Ndat, Ndat)}, but got {shp}")
+        self._corr = corr
 
     def get_model(self):
         if self._normPDF_before_eval:

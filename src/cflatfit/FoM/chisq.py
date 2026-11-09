@@ -13,7 +13,16 @@ class Chi2(FigureOfMerit):
     
     def evaluate(self) -> float:
         return self.chi2()
+
+
+class Chi2Corr(FigureOfMerit):
+    def __init__(self, ignore_constraint: bool = False):
+        super().__init__(ignore_constraint)
     
+    def evaluate(self) -> float:
+        chi = [cf.chi2_correlated(ich.data, ich.get_model(), ich._covinv) for ich in self.channels.values()]
+        return np.sum(chi) + self.get_constraint_term()
+
 
 class Chi2DA(FigureOfMerit):
     def __init__(self, ignore_constraint: bool = False):
