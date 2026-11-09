@@ -29,6 +29,7 @@ class ConstraintType(StrEnum):
     GAUSSIANSCALE = "GaussianScale"
     POISSON       = "Poisson"
     BB            = "Poisson"
+    SPD           = "SPD"
 
 
 def parse_constraint(constraint_type: ConstraintType, constraint_vals: list[float]) -> bool:
@@ -43,6 +44,11 @@ def parse_constraint(constraint_type: ConstraintType, constraint_vals: list[floa
         case ConstraintType.POISSON:
             if len(constraint_vals) != 1:
                 logger.error(f"{constraint_type} constraint expects vals [mu]")
+                return False
+            return True
+        case ConstraintType.SPD:
+            if len(constraint_vals) != 2:
+                logger.error(f"{constraint_type} constraint expects vals [scaled_mu, scale]")
                 return False
             return True
     logger.error(f"Invalid constraint type {constraint_type}")
@@ -188,6 +194,9 @@ class Parameter:
                 return cf.nll_gaussian(self.constraintvals[0], self.getVal(), self.constraintvals[1])
             case ConstraintType.POISSON:
                 return cf.nll_poisson(self.constraintvals[0], self.getVal())
+            case ConstraintType.SPD:
+                smu = self.getVal()*self.constraintvals[1]
+                return cf.nll_poisson(self.constraintvals[0], smu)
         return 0.0
 
     def setVal(self, val: float) -> None:

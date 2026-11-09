@@ -218,7 +218,37 @@ class TemplateBB(Template):
         return hist, norm
 
 
+class TemplateBBS(Template):
+    def __init__(self,
+                 name: str,
+                 N: np.ndarray,
+                 Nerr: np.ndarray,
+                 isnorm: bool) -> None:
+        super().__init__(name, N, Nerr, isnorm)
+        self._constraint = ConstraintType.SPD
 
+    def create_nuisance(self, ibin: int) -> None:
+        bin_N = self.N[ibin]
+        bin_err = self.Nerr[ibin]
+        scale = bin_N/(bin_err**2)
+        xi = Parameter(f"{self.name}_nuisance[{ibin}]", bin_N, limlo = max(0.0, bin_N-8.*bin_err), limhi = bin_N+8.*bin_err)
+        xi.set_constraint(ConstraintType.SPD, [scale*bin_N, scale])
+        xi.use()
+        self.param_manager.addParam(xi)
+        self.nuisance_params.append(xi.name)
+    
+    def update_nuisance(self, ibin) -> None:
+        par = self.nuisance_params[ibin]
+        val = self.N[ibin]
+        self.param_manager.params[par].constrain_poisson(val)
+
+    def calc_hist(self) -> tuple[np.ndarray, float]:
+        self.vary_hist()
+        self.update_all_nuisance()
+        hist = self.get_nuisance_hist()
+        hist += self.get_additive_mod(self.N)
+        norm = np.sum(hist)        
+        return hist, norm
 
 
 class TemplateGauss(Template):
@@ -236,8 +266,9 @@ class TemplateGauss(Template):
         sigma = bin_err/bin_N if bin_N > 0. else 1.
         xi = Parameter(f"{self.name}_nuisance[{ibin}]", 1.0, limlo = max(0.0, 1.-10*sigma), limhi = 1.+10.*sigma)
         xi.constrain_gauss(1.0, sigma)
-        if bin_N <= 0.0 or sigma > 1.0:
-            logger.warning(f"Template {self.name} Invalid yield in bin {ibin} (N={bin_N}), {xi.name} is fixed to 1.0")
+        # if bin_N <= 0.0 or sigma > 1.0:
+        if bin_N <= 0.0 or sigma > 4.0:
+            logger.warning(f"Template {self.name} Invalid yield in bin {ibin} (N={bin_N}+-{bin_err}), {xi.name} is fixed to 1.0")
             xi.fix(1.0)
         xi.use()
         self.param_manager.addParam(xi)
